@@ -66,4 +66,110 @@ using XML index PXML_Teaminfo
 for Property 
 
 --1. ceate a non-clustered index on the productname field in the Product_details table. crea 
-create index ixproductname on Product_Details(productname)
+create index ixproductname on dbo.Product_Details(ProductName);
+
+--modify/alter the name of the ixProdName non-clustered index to 'IX_ProductName'
+exex sp_rename N'dbo.product_details.ixProdname', N'IX_ProductName', N'Index';
+
+--modify/alter the IX_ProductName' non-clustered index to disable it
+alter index IX_ProductNme on dbo.Producct_details Disable;
+
+--modify/alter the IX_ProductName' non-clustered index to disable it
+alter index IX_ProductNme on dbo.Producct_details rebuild;
+
+--remove/delete the iX_productName non-clustered index if it exists 
+drop index if exists IX_ProductName on dbo.Product _details;
+
+--create a table with computed values then index the computed column field 
+if OBJECT_ID('tblCalcArea') is null
+	create table tblCalcArea 
+	(
+		length decimal(10,2)
+		breadth decimal(10,2)
+		area as length*breadth-- => computed column given by length multiplied by width
+
+else
+	 print the table tblCalcArea table already existsand will not be recreated
+
+--add records into the table tblCalcArea table
+insert into tblCalcArea(length, breadth)
+values 
+(34,10)
+(20,200)
+(33.4,12)
+(12,7)
+
+--check whether the records were inseerted successully
+select* from tblCalcArea
+
+--create an index on the area computed column
+create index ixArea on dbo.tblCalcArea(Areaa);
+
+--the above index will be used in a querry to get shapes with an area less than 400
+select*
+from tblCalcArea
+where Area<400
+
+--create a unique index on the 'Emp_Cellular' phone table for the personid column
+create unique index ixPersonID on dbo.emp_cellularphone (PersonID);
+
+--create a filtered index for products sold for 4000or more on the product_details table 
+create index ixExpensiveProduct on dbo.Product_Details(rate)
+where rate >= 4000;
+
+--use the above index to get products costing 4000 or more
+select ProductID, ProductName [Product Name], Rate, coalasce(Description) [Descriptoon] --use coalesce to remove nulls from the resulttest
+from Product_details where Rate >= 4000;
+
+--1. Create an Employee's Table
+Create Table Employee
+(
+	EmpID int not null primary key,
+	EmpName nvarchar(100) not null,
+	Salary int not null,
+	Address nvarchar(200) not null
+);
+ 
+--2. Insert employee records
+Insert into dbo.Employee
+values
+(1,'Derek', 12000, 'Houston'),
+(2,'David', 25000, 'Texas'),
+(3,'Alan', 22000, 'New York'),
+(4,'Matthew', 22000, 'Las Vegas'),
+(5,'Joseph', 28000, 'Chicago');
+ 
+--3. Confirm entry of records into the Employee's Table
+Select * from Employee;
+ 
+--4. Declare a cursor on the Employee's Table
+set nocount on
+declare @id int, @name nvarchar(100), @salary int
+--A cursor is declared by defining sql statements that return a resultset
+declare curEmp Cursor
+static for 
+Select EmpID, EmpName, Salary from employee
+--A cursor is opened and populated by executing the statement(s) 
+--defined in the cursor
+open curEmp
+--Execute the statements below if the emp cursor contains rows
+if @@CURSOR_ROWS > 0
+	begin
+		--Rows are fetched from the cursor one by one or in a block
+		--for data manipulation
+		Fetch next from curEmp into @id, @name, @salary
+		while @@FETCH_STATUS = 0
+		begin
+			print 'ID: ' + convert(nvarchar(20),@id) + char(13) +
+			'Name: ' + @name + char(13) +
+			'Salary: ' + convert(nvarchar(20),@salary) + char(13)--> used for line break
+			Fetch next from curEmp into @id, @name, @salary
+		End
+	End
+--Close the cursor explicitly
+Close curEmp
+--Delete the cursor definition and release all the system resources associated
+--with the cursor
+deallocate curEmp
+set nocount off
+
